@@ -14,3 +14,4 @@ mean(mtcars$mpg)
 hist(mtcars$mpg)
 
 #Add some more code below as instructed, then commit to your repository
+plot(mtcars$mpg ~ mtcars$wt) 
