@@ -7,6 +7,11 @@
   add it to the "User Preferences" section below and commit the update to this
   file, so it's remembered in future sessions.
 
+## About the User
+
+- 19 years old.
+- Student at Lehigh University.
+
 ## User Preferences
 
 - Save every explicit preference to this `CLAUDE.md` file.
