@@ -1,0 +1,35 @@
+:root {
+  --bg: #f7f7f5;
+  --card: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6b6b70;
+  --accent: #3b6fd8;
+  --grid: #e4e4e7;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416;
+    --card: #1e1e22;
+    --text: #ededf0;
+    --muted: #9a9aa2;
+    --accent: #7aa2f7;
+    --grid: #2e2e34;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+main { max-width: 900px; margin: 0 auto; padding: 32px 16px; }
+h1 { margin: 0 0 4px; }
+.sub { color: var(--muted); margin: 0 0 24px; }
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.card { background: var(--card); border-radius: 12px; padding: 20px; }
+.card h2 { font-size: 15px; margin: 0 0 12px; color: var(--muted); font-weight: 500; }
+.stat { font-size: 40px; font-weight: 600; }
+code { font-size: 13px; color: var(--muted); }
+svg { width: 100%; height: auto; display: block; }
+svg text { fill: var(--muted); font-size: 11px; }
