@@ -9,6 +9,7 @@
 
 ## About the User
 
+- Name: Ava Decker.
 - 19 years old.
 - Student at Lehigh University.
 
