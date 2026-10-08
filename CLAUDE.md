@@ -10,3 +10,5 @@
 ## User Preferences
 
 - Save every explicit preference to this `CLAUDE.md` file.
+- Never use em dashes, in any writing or code. The only exception is when the
+  user is talking about The Brown and White.
