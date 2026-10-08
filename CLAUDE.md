@@ -12,3 +12,5 @@
 - Save every explicit preference to this `CLAUDE.md` file.
 - Never use em dashes, in any writing or code. The only exception is when the
   user is talking about The Brown and White.
+- Never create or add custom fonts or colors (e.g., in plots, styling, or
+  documents). Use the defaults. No "AI slop" styling.
