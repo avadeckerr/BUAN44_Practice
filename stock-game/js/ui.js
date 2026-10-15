@@ -8,18 +8,17 @@ const UI = (() => {
   const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
   const els = {}; // cached DOM elements
 
-  function init(config, handlers) {
+  function init(handlers) {
     for (const id of [
-      "ticker", "stock-name", "day", "price", "price-change", "cash", "shares",
-      "holdings", "portfolio", "pnl", "qty", "buy-btn", "sell-btn", "next-btn",
-      "message", "chart", "day-total", "end-screen", "end-title", "end-reason",
-      "end-value", "end-pnl", "end-best", "end-worst", "end-trades", "play-again-btn",
+      "ticker", "stock-name", "sector", "risk", "day", "price", "price-change", "cash",
+      "shares", "holdings", "portfolio", "pnl", "qty", "buy-btn", "sell-btn", "next-btn",
+      "message", "chart", "day-total", "news-banner", "news-tag", "news-text", "news-note",
+      "news-list", "end-screen", "end-title", "end-reason", "end-stock", "end-mood",
+      "end-value", "end-pnl", "end-best", "end-worst", "end-trades", "end-news",
+      "play-again-btn",
     ]) {
       els[id] = document.getElementById(id);
     }
-
-    els.ticker.textContent = config.stock.ticker;
-    els["stock-name"].textContent = config.stock.name;
 
     const readQty = () => Number(els.qty.value);
     els["buy-btn"].addEventListener("click", () => handlers.onBuy(readQty()));
@@ -40,6 +39,14 @@ const UI = (() => {
     const value = GameState.portfolioValue(state);
     const pnl = value - state.startingCash;
 
+    const c = state.company;
+    els.ticker.textContent = c.ticker;
+    els["stock-name"].textContent = c.name;
+    els.sector.textContent = c.sectorLabel;
+    const risk = Companies.riskLabel(c.volatility);
+    els.risk.textContent = `${risk} risk`;
+    els.risk.className = "risk " + risk.toLowerCase();
+
     els.day.textContent = state.day;
     els["day-total"].textContent = state.gameLength;
     els.price.textContent = money.format(price);
@@ -58,8 +65,75 @@ const UI = (() => {
     const over = state.status !== "playing";
     for (const id of ["qty", "buy-btn", "sell-btn", "next-btn"]) els[id].disabled = over;
 
+    renderNews(state);
     drawChart(state);
     renderEndScreen(state);
+  }
+
+  // --- news ---------------------------------------------------------------
+
+  function renderNews(state) {
+    const { headline, reaction } = state.today;
+    const banner = els["news-banner"];
+    let tag, text, note, mood;
+
+    if (headline) {
+      mood = headline.impact >= 0 ? "good" : "bad";
+      text = headline.text;
+      if (headline.timing === "next") {
+        tag = "Developing";
+        note = `The market reacts tomorrow. You have today to trade before it hits.`;
+      } else {
+        tag = "Breaking";
+        note = `${state.company.ticker} moved ${pct(headline.impact)} on the news today.`;
+      }
+      if (reaction) note += ` Yesterday's story also hit today: ${pct(reaction.impact)}.`;
+    } else if (reaction) {
+      mood = reaction.impact >= 0 ? "good" : "bad";
+      tag = "Market reaction";
+      text = reaction.text;
+      note = `Yesterday's story hit the price this morning: ${pct(reaction.impact)}.`;
+    } else {
+      mood = "quiet";
+      tag = "Quiet day";
+      text = state.day === 1 ? "No news yet." : "No major news today.";
+      note = state.day === 1 ? "Headlines break about once a week and can move the price a lot." : "";
+    }
+
+    banner.className = "news-banner " + mood;
+    els["news-tag"].textContent = tag;
+    els["news-text"].textContent = text;
+    els["news-note"].textContent = note;
+    els["news-note"].hidden = !note;
+
+    // Feed: newest first. Pending stories hide their impact until they hit.
+    const list = els["news-list"];
+    list.replaceChildren();
+    if (state.newsLog.length === 0) {
+      const li = document.createElement("li");
+      li.className = "news-empty";
+      li.textContent = "No headlines yet.";
+      list.append(li);
+      return;
+    }
+    for (const n of [...state.newsLog].reverse()) {
+      const li = document.createElement("li");
+      const day = document.createElement("span");
+      day.className = "news-day";
+      day.textContent = `Day ${n.day}`;
+      const body = document.createElement("span");
+      body.className = "news-item-text";
+      body.textContent = n.text;
+      const chip = document.createElement("span");
+      chip.className = "news-chip " + (n.pending ? "pending" : n.impact >= 0 ? "good" : "bad");
+      chip.textContent = n.pending ? "Reacts tomorrow" : pct(n.impact);
+      li.append(day, body, chip);
+      list.append(li);
+    }
+  }
+
+  function pct(impact) {
+    return `${impact >= 0 ? "+" : "−"}${Math.round(Math.abs(impact) * 100)}%`;
   }
 
   // Shows the end screen when the game is over, hides it otherwise.
@@ -87,6 +161,9 @@ const UI = (() => {
     els["end-best"].textContent = s.best ? `Day ${s.best.day}: ${signedMoney(s.best.change)}` : "–";
     els["end-worst"].textContent = s.worst ? `Day ${s.worst.day}: ${signedMoney(s.worst.change)}` : "–";
     els["end-trades"].textContent = s.tradeCount;
+    els["end-stock"].textContent = `${s.company.ticker} (${s.company.sectorLabel})`;
+    els["end-mood"].textContent = s.mood.name;
+    els["end-news"].textContent = s.newsCount;
 
     const wasHidden = screen.hidden;
     screen.hidden = false;
@@ -129,7 +206,7 @@ const UI = (() => {
     const css = getComputedStyle(document.documentElement);
     const color = (name) => css.getPropertyValue(name).trim();
 
-    const pad = { top: 16, right: 16, bottom: 28, left: 64 };
+    const pad = { top: 34, right: 16, bottom: 28, left: 64 }; // top leaves room for news badges
     const plotW = w - pad.left - pad.right;
     const plotH = h - pad.top - pad.bottom;
 
@@ -219,6 +296,42 @@ const UI = (() => {
       }
       ctx.closePath();
       ctx.fill();
+    }
+
+    // News badges: a "!" circle above each news day. Filled green/red once
+    // the move has hit; hollow while a "next day" story is still pending.
+    for (const n of state.newsLog) {
+      const nx = x(n.index);
+      const ny = 14;
+      const c = n.impact >= 0 ? color("--up") : color("--down");
+      // faint guide line from the badge down to that day's price
+      ctx.strokeStyle = c;
+      ctx.globalAlpha = 0.35;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath();
+      ctx.moveTo(nx, ny + 8);
+      ctx.lineTo(nx, y(prices[n.index]));
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      ctx.arc(nx, ny, 8, 0, Math.PI * 2);
+      if (n.pending) {
+        ctx.fillStyle = color("--card");
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = c;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = c;
+        ctx.fill();
+      }
+      ctx.fillStyle = n.pending ? c : color("--card");
+      ctx.font = "bold 11px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("!", nx, ny + 0.5);
     }
 
     // Dot on today's price.

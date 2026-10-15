@@ -11,7 +11,7 @@
     <header class="header">
       <div>
         <h1>Market Survival</h1>
-        <p class="subtitle"><strong id="ticker"></strong> · <span id="stock-name"></span></p>
+        <p class="subtitle"><strong id="ticker"></strong> · <span id="stock-name"></span> · <span id="sector"></span> <span id="risk" class="risk"></span></p>
       </div>
       <div class="day">Day <span id="day">1</span> of <span id="day-total">100</span></div>
     </header>
@@ -38,6 +38,14 @@
       </div>
     </section>
 
+    <section id="news-banner" class="news-banner" aria-live="polite">
+      <span id="news-tag" class="news-tag"></span>
+      <div class="news-body">
+        <p id="news-text" class="news-text"></p>
+        <p id="news-note" class="news-note"></p>
+      </div>
+    </section>
+
     <section class="chart-card">
       <canvas id="chart" aria-label="Stock price chart" role="img"></canvas>
     </section>
@@ -52,7 +60,12 @@
       <button id="next-btn" class="btn next">Next Day →</button>
     </section>
 
-    <p id="message" class="message" aria-live="polite">Welcome! You have $10,000. Buy low, sell high.</p>
+    <p id="message" class="message" aria-live="polite"></p>
+
+    <section class="news-feed">
+      <h2>News feed</h2>
+      <ol id="news-list" class="news-list"></ol>
+    </section>
   </main>
 
   <!-- End screen: hidden until the game is won or lost. -->
@@ -61,11 +74,14 @@
       <h2 id="end-title" class="end-title"></h2>
       <p id="end-reason" class="end-reason"></p>
       <dl class="end-stats">
+        <div><dt>Stock</dt><dd id="end-stock"></dd></div>
+        <div><dt>Market mood</dt><dd id="end-mood"></dd></div>
         <div><dt>Final portfolio value</dt><dd id="end-value"></dd></div>
         <div><dt>Total profit / loss</dt><dd id="end-pnl"></dd></div>
         <div><dt>Best day</dt><dd id="end-best"></dd></div>
         <div><dt>Worst day</dt><dd id="end-worst"></dd></div>
         <div><dt>Trades made</dt><dd id="end-trades"></dd></div>
+        <div><dt>Headlines</dt><dd id="end-news"></dd></div>
       </dl>
       <button id="play-again-btn" class="btn next">Play again</button>
     </div>
@@ -73,7 +89,9 @@
 
   <!-- Load order matters: each file uses the ones above it. -->
   <script src="js/config.js"></script>
+  <script src="js/companies.js"></script>
   <script src="js/market.js"></script>
+  <script src="js/news.js"></script>
   <script src="js/state.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/main.js"></script>

@@ -5,9 +5,14 @@
 // =============================================================
 
 const GameState = {
-  // Builds a fresh game. `priceHistory` comes from the market engine.
-  create(config, priceHistory) {
+  // Builds a fresh game. `setup` says what this game rolled:
+  //   { company, mood, market: { trend, volatility } }
+  // `priceHistory` comes from the market engine.
+  create(config, setup, priceHistory) {
     return {
+      company: setup.company,
+      mood: setup.mood,     // secret until the game ends
+      market: setup.market, // the random-walk settings for this game
       day: 1,
       cash: config.startingCash,
       startingCash: config.startingCash,
@@ -17,6 +22,9 @@ const GameState = {
       priceHistory,     // array of daily closing prices; last item = today
       trades: [],       // { type: "buy"|"sell", shares, price, day, index }
       dailyChanges: [], // { day, change }: portfolio gain/loss each day
+      newsLog: [],       // { day, index, text, impact, timing, pending }
+      pendingNews: null, // a "next"-day headline whose price move hasn't hit yet
+      today: { headline: null, reaction: null }, // what the news banner shows
       status: "playing", // "playing" | "won" | "lost"
       endReason: null,   // "floor" (fell below loseFloor) | "time" (reached the last day)
     };
@@ -66,13 +74,35 @@ const GameState = {
     return { ok: true, message: `Sold ${qty} share(s) at $${price.toFixed(2)}.` };
   },
 
-  // Moves the game forward one day with the price the market produced,
-  // records how much the portfolio moved, then checks for game over.
-  advanceDay(state, newPrice) {
+  // Moves the game forward one day with the price the market produced
+  // (news impact already included), files today's headline if there is
+  // one, records how much the portfolio moved, then checks for game over.
+  advanceDay(state, newPrice, headline = null) {
     if (state.status !== "playing") return;
     const before = GameState.portfolioValue(state);
     state.priceHistory.push(newPrice);
     state.day += 1;
+
+    // Yesterday's "next day" story has now hit the price.
+    const reaction = state.pendingNews;
+    if (reaction) reaction.pending = false;
+    state.pendingNews = null;
+
+    let entry = null;
+    if (headline) {
+      entry = {
+        day: state.day,
+        index: state.priceHistory.length - 1, // where to mark it on the chart
+        text: headline.text,
+        impact: headline.impact,
+        timing: headline.timing,
+        pending: headline.timing === "next",
+      };
+      state.newsLog.push(entry);
+      if (entry.pending) state.pendingNews = entry;
+    }
+    state.today = { headline: entry, reaction };
+
     state.dailyChanges.push({
       day: state.day,
       change: round2(GameState.portfolioValue(state) - before),
@@ -112,6 +142,9 @@ const GameState = {
       best,
       worst,
       tradeCount: state.trades.length,
+      newsCount: state.newsLog.length,
+      company: state.company,
+      mood: state.mood,
     };
   },
 };

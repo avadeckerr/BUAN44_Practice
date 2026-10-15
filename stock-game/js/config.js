@@ -1,6 +1,6 @@
 // =============================================================
-// config.js — every tunable number in the game lives here.
-// Change these to make the market calmer, wilder, bullish, or bearish.
+// config.js — every tunable game rule lives here.
+// The stocks themselves (and their trend/volatility) are in companies.js.
 // =============================================================
 
 const CONFIG = {
@@ -13,21 +13,23 @@ const CONFIG = {
   // If your portfolio value drops below this, you lose immediately.
   loseFloor: 5000,
 
-  stock: {
-    ticker: "ACME",
-    name: "Acme Rocket Co.",
-    startPrice: 100,
-  },
+  // Chance that a news headline breaks on any given day.
+  // 1 / 6 ≈ one headline per week of trading. Set to 0 to turn news off.
+  newsChance: 1 / 6,
 
-  market: {
-    // Expected daily return. 0.0005 = +0.05% per day (~13% per year).
-    // Use a negative number for a bear market.
-    trend: 0.0005,
+  // Each game secretly rolls one market mood. Its trendShift is added to
+  // the company's own trend, so the same stock can boom in one game and
+  // sink in the next. The mood is revealed on the end screen.
+  // 0.0015 per day ≈ ±16% over a 100-day game.
+  moods: [
+    { name: "Bull market", trendShift: 0.0015 },
+    { name: "Bear market", trendShift: -0.0015 },
+    { name: "Sideways market", trendShift: 0 },
+  ],
 
-    // Daily volatility (standard deviation of daily returns).
-    // 0.02 = a typical day moves about ±2%. Try 0.05 for chaos.
-    volatility: 0.02,
-  },
+  // Each game's starting price is the company's base price, randomly
+  // moved up or down by as much as this fraction (0.3 = ±30%).
+  startPriceJitter: 0.3,
 
   // Days of price history generated before the game starts,
   // so the chart isn't empty on day 1.
