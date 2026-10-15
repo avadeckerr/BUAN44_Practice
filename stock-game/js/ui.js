@@ -12,7 +12,8 @@ const UI = (() => {
     for (const id of [
       "ticker", "stock-name", "day", "price", "price-change", "cash", "shares",
       "holdings", "portfolio", "pnl", "qty", "buy-btn", "sell-btn", "next-btn",
-      "message", "chart",
+      "message", "chart", "day-total", "end-screen", "end-title", "end-reason",
+      "end-value", "end-pnl", "end-best", "end-worst", "end-trades", "play-again-btn",
     ]) {
       els[id] = document.getElementById(id);
     }
@@ -24,6 +25,7 @@ const UI = (() => {
     els["buy-btn"].addEventListener("click", () => handlers.onBuy(readQty()));
     els["sell-btn"].addEventListener("click", () => handlers.onSell(readQty()));
     els["next-btn"].addEventListener("click", () => handlers.onNextDay());
+    els["play-again-btn"].addEventListener("click", () => handlers.onPlayAgain());
 
     // Redraw the chart when the window size changes.
     window.addEventListener("resize", () => handlers.onResize());
@@ -39,6 +41,7 @@ const UI = (() => {
     const pnl = value - state.startingCash;
 
     els.day.textContent = state.day;
+    els["day-total"].textContent = state.gameLength;
     els.price.textContent = money.format(price);
     els["price-change"].textContent =
       `${change >= 0 ? "▲" : "▼"} ${money.format(Math.abs(change))} (${changePct.toFixed(2)}%)`;
@@ -48,11 +51,50 @@ const UI = (() => {
     els.shares.textContent = state.shares.toLocaleString();
     els.holdings.textContent = `worth ${money.format(state.shares * price)}`;
     els.portfolio.textContent = money.format(value);
-    els.pnl.textContent =
-      `${pnl >= 0 ? "+" : "−"}${money.format(Math.abs(pnl))} since start`;
+    els.pnl.textContent = `${signedMoney(pnl)} since start`;
     setTrend(els.pnl, pnl);
 
+    // Lock the controls once the game is over.
+    const over = state.status !== "playing";
+    for (const id of ["qty", "buy-btn", "sell-btn", "next-btn"]) els[id].disabled = over;
+
     drawChart(state);
+    renderEndScreen(state);
+  }
+
+  // Shows the end screen when the game is over, hides it otherwise.
+  function renderEndScreen(state) {
+    const screen = els["end-screen"];
+    if (state.status === "playing") {
+      screen.hidden = true;
+      return;
+    }
+    const s = GameState.summary(state);
+    const won = s.status === "won";
+
+    els["end-title"].textContent = won ? "You survived!" : "Game over";
+    els["end-title"].className = "end-title " + s.status;
+    els["end-reason"].textContent =
+      s.endReason === "floor"
+        ? `Your portfolio fell below ${money.format(state.loseFloor)} on day ${s.day}.`
+        : won
+          ? `You made it to day ${s.day} with more than you started with.`
+          : `You made it to day ${s.day}, but finished at or below your starting ${money.format(state.startingCash)}.`;
+
+    els["end-value"].textContent = money.format(s.finalValue);
+    els["end-pnl"].textContent = signedMoney(s.profit);
+    setTrend(els["end-pnl"], s.profit);
+    els["end-best"].textContent = s.best ? `Day ${s.best.day}: ${signedMoney(s.best.change)}` : "–";
+    els["end-worst"].textContent = s.worst ? `Day ${s.worst.day}: ${signedMoney(s.worst.change)}` : "–";
+    els["end-trades"].textContent = s.tradeCount;
+
+    const wasHidden = screen.hidden;
+    screen.hidden = false;
+    if (wasHidden) els["play-again-btn"].focus(); // so Enter/Space starts a new game
+  }
+
+  function signedMoney(n) {
+    return `${n >= 0 ? "+" : "−"}${money.format(Math.abs(n))}`;
   }
 
   // Shows feedback from a trade. `result` is { ok, message } from GameState.

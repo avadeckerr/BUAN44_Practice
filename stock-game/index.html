@@ -13,7 +13,7 @@
         <h1>Market Survival</h1>
         <p class="subtitle"><strong id="ticker"></strong> · <span id="stock-name"></span></p>
       </div>
-      <div class="day">Day <span id="day">1</span></div>
+      <div class="day">Day <span id="day">1</span> of <span id="day-total">100</span></div>
     </header>
 
     <section class="stats">
@@ -54,6 +54,22 @@
 
     <p id="message" class="message" aria-live="polite">Welcome! You have $10,000. Buy low, sell high.</p>
   </main>
+
+  <!-- End screen: hidden until the game is won or lost. -->
+  <div id="end-screen" class="end-screen" hidden>
+    <div class="end-card" role="dialog" aria-modal="true" aria-labelledby="end-title">
+      <h2 id="end-title" class="end-title"></h2>
+      <p id="end-reason" class="end-reason"></p>
+      <dl class="end-stats">
+        <div><dt>Final portfolio value</dt><dd id="end-value"></dd></div>
+        <div><dt>Total profit / loss</dt><dd id="end-pnl"></dd></div>
+        <div><dt>Best day</dt><dd id="end-best"></dd></div>
+        <div><dt>Worst day</dt><dd id="end-worst"></dd></div>
+        <div><dt>Trades made</dt><dd id="end-trades"></dd></div>
+      </dl>
+      <button id="play-again-btn" class="btn next">Play again</button>
+    </div>
+  </div>
 
   <!-- Load order matters: each file uses the ones above it. -->
   <script src="js/config.js"></script>

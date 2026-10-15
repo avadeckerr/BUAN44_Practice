@@ -2,6 +2,8 @@
 
 A tiny stock market game in plain HTML, CSS, and JavaScript. Start with $10,000, trade one fictional stock, and click **Next Day** to see where the market goes.
 
+**Goal:** survive 100 days and finish with more than $10,000. If your portfolio ever drops below $5,000, you lose immediately.
+
 ## Run it
 Open `index.html` in any browser. No install or server needed.
 
@@ -22,3 +24,5 @@ Data flows one way: **main** asks **state** to change, then tells **ui** to redr
 In `js/config.js`:
 - `trend`: expected daily return (`0.0005` ≈ +13%/year; negative = bear market)
 - `volatility`: typical daily move (`0.02` ≈ ±2%/day)
+- `gameLength`: how many days you must survive (default `100`)
+- `loseFloor`: portfolio value that ends the game instantly (default `5000`)

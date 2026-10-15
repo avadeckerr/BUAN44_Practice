@@ -13,6 +13,7 @@
   --up: #16a34a;
   --down: #dc2626;
   --accent: #2563eb;
+  --overlay: rgba(15, 17, 21, 0.45);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,10 +27,12 @@
     --up: #22c55e;
     --down: #f05252;
     --accent: #3b82f6;
+    --overlay: rgba(0, 0, 0, 0.6);
   }
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -127,10 +130,45 @@ h1 { margin: 0; font-size: 1.6rem; }
 .btn.buy { background: var(--up); }
 .btn.sell { background: var(--down); }
 .btn.next { background: var(--accent); margin-left: auto; }
+.btn:disabled,
+.qty input:disabled { opacity: 0.45; cursor: not-allowed; filter: none; transform: none; }
+.btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 .message { min-height: 1.4em; margin-top: 14px; color: var(--muted); }
 .message.ok { color: var(--text); }
 .message.error { color: var(--down); }
+
+/* --- end screen --- */
+.end-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: var(--overlay);
+  z-index: 20;
+}
+.end-card {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.end-title { margin: 0; font-size: 1.8rem; }
+.end-title.won { color: var(--up); }
+.end-title.lost { color: var(--down); }
+.end-reason { margin: 0; color: var(--muted); }
+.end-stats { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.end-stats div { display: flex; justify-content: space-between; gap: 12px; }
+.end-stats dt { color: var(--muted); }
+.end-stats dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+.end-card .btn.next { margin-left: 0; flex: none; }
 
 /* --- phones --- */
 @media (max-width: 640px) {

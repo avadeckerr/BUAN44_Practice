@@ -6,6 +6,13 @@
 const CONFIG = {
   startingCash: 10000,
 
+  // How long the game lasts, in trading days. To win, your portfolio
+  // must be worth more than startingCash on the last day.
+  gameLength: 100,
+
+  // If your portfolio value drops below this, you lose immediately.
+  loseFloor: 5000,
+
   stock: {
     ticker: "ACME",
     name: "Acme Rocket Co.",
