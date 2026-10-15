@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Market Survival</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div>
+        <h1>Market Survival</h1>
+        <p class="subtitle"><strong id="ticker"></strong> · <span id="stock-name"></span></p>
+      </div>
+      <div class="day">Day <span id="day">1</span></div>
+    </header>
+
+    <section class="stats">
+      <div class="stat">
+        <span class="label">Price</span>
+        <span class="value" id="price">–</span>
+        <span class="sub" id="price-change"></span>
+      </div>
+      <div class="stat">
+        <span class="label">Cash</span>
+        <span class="value" id="cash">–</span>
+      </div>
+      <div class="stat">
+        <span class="label">Shares owned</span>
+        <span class="value" id="shares">0</span>
+        <span class="sub" id="holdings"></span>
+      </div>
+      <div class="stat highlight">
+        <span class="label">Portfolio value</span>
+        <span class="value" id="portfolio">–</span>
+        <span class="sub" id="pnl"></span>
+      </div>
+    </section>
+
+    <section class="chart-card">
+      <canvas id="chart" aria-label="Stock price chart" role="img"></canvas>
+    </section>
+
+    <section class="controls">
+      <label class="qty">
+        <span>Shares</span>
+        <input id="qty" type="number" min="1" step="1" value="10" />
+      </label>
+      <button id="buy-btn" class="btn buy">Buy</button>
+      <button id="sell-btn" class="btn sell">Sell</button>
+      <button id="next-btn" class="btn next">Next Day →</button>
+    </section>
+
+    <p id="message" class="message" aria-live="polite">Welcome! You have $10,000. Buy low, sell high.</p>
+  </main>
+
+  <!-- Load order matters: each file uses the ones above it. -->
+  <script src="js/config.js"></script>
+  <script src="js/market.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

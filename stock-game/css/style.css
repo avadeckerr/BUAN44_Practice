@@ -1,0 +1,141 @@
+/* =============================================================
+   style.css — colors are defined once as variables at the top.
+   The chart reads --up, --down, --grid, and --muted too.
+   ============================================================= */
+
+:root {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --text: #1b1f24;
+  --muted: #6b7280;
+  --grid: #e5e7eb;
+  --border: #e3e5e8;
+  --up: #16a34a;
+  --down: #dc2626;
+  --accent: #2563eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115;
+    --card: #181b21;
+    --text: #e8eaed;
+    --muted: #9aa0a6;
+    --grid: #2a2e36;
+    --border: #2a2e36;
+    --up: #22c55e;
+    --down: #f05252;
+    --accent: #3b82f6;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+/* --- header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+h1 { margin: 0; font-size: 1.6rem; }
+.subtitle { margin: 4px 0 0; color: var(--muted); }
+.day {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+/* --- stat cards --- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.stat.highlight { border-color: var(--accent); }
+.label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.value { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sub { font-size: 0.85rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.up { color: var(--up); }
+.down { color: var(--down); }
+
+/* --- chart --- */
+.chart-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 8px;
+  margin-bottom: 16px;
+}
+#chart { display: block; width: 100%; height: 320px; }
+
+/* --- controls --- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-end;
+}
+.qty { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; color: var(--muted); }
+.qty input {
+  width: 110px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+}
+.btn {
+  padding: 11px 22px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.15s, transform 0.05s;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn:active { transform: translateY(1px); }
+.btn.buy { background: var(--up); }
+.btn.sell { background: var(--down); }
+.btn.next { background: var(--accent); margin-left: auto; }
+
+.message { min-height: 1.4em; margin-top: 14px; color: var(--muted); }
+.message.ok { color: var(--text); }
+.message.error { color: var(--down); }
+
+/* --- phones --- */
+@media (max-width: 640px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  #chart { height: 240px; }
+  .btn.next { margin-left: 0; flex: 1 1 100%; }
+  .btn.buy, .btn.sell { flex: 1; }
+}
